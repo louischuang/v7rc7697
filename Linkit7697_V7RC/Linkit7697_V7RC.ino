@@ -1,9 +1,18 @@
 // Company: V7 IDEA TECHNOLOGY LTD.
 // Author: Louis Chuang
+// Date: 2019-10-03
+// Version: 1.00.02
+// Subject: 修改ss8的命令，改為16進位制
+// 原始碼使用說明： 請尊重智慧財產權，此為開源程式碼，但請尊重原創作者，如要使用於他處，請註明出處。
+// 附加註記： 這個版本需要搭配Miniplan RobotShield的電源板
+
 // Date: 2019-08-09
-// Version: 1.00.00
+// Version: 1.00.01
 // Subject: 給Linkit 7697與MiniPlan Robot Shield使用的程式碼，需要搭配V7RC使用;
 // 原始碼使用說明： 請尊重智慧財產權，此為開源程式碼，但請尊重原創作者，如要使用於他處，請註明出處。
+// 附加註記： 這個版本需要搭配Miniplan RobotShield的電源板
+
+// Update Note. 增加Debug註記，如果debug mode才會透過Serial Port印出相關數據
 
 #include <LBLE.h>
 #include <LBLEPeriphral.h>
@@ -73,10 +82,15 @@ void setup() {
     delay(100);
   }
 
-  Serial.println("BLE ready");
-  Serial.print("Device Address = [");
-  Serial.print(LBLE.getDeviceAddress());
-  Serial.println("]");
+  if (isDebug) {
+
+    Serial.println("BLE ready");
+    Serial.print("Device Address = [");
+    Serial.print(LBLE.getDeviceAddress());
+    Serial.println("]");
+
+  }
+
 
   char buf1 [100] = {'\0'};
 
@@ -131,7 +145,7 @@ void setup() {
   pinMode(dcMotorPinB[1], OUTPUT);
 
   processDCMotor(SERVO_DEFAULT_VALUE, dcMotorPinA);
-   processDCMotor(SERVO_DEFAULT_VALUE, dcMotorPinB);
+  processDCMotor(SERVO_DEFAULT_VALUE, dcMotorPinB);
 
 }
 
@@ -147,10 +161,13 @@ void loop() {
 
       thisPacket = uartInputCharacteristic.getValue();
 
-       Serial.println(thisPacket);
-       Serial.println(thisPacket.length());
+      if (isDebug) {
+        // Serial.println(thisPacket);
+        // Serial.println(thisPacket.length());
+      }
 
-        processRCString(thisPacket);
+
+      processRCString(thisPacket);
 
     } else {
 
@@ -162,9 +179,10 @@ void loop() {
 
   }
 
-  Serial.println("BLE斷線！");
+  if (isDebug) Serial.println("BLE斷線！");
+
   int thisAngle =  map(SERVO_DEFAULT_VALUE, 544, 2400, 0, 180);
-  for(int i = 0; i < numOfServo; i ++) {
+  for (int i = 0; i < numOfServo; i ++) {
     // robotServo[i].write(thisAngle);
     robotServo[i].writeMicroseconds(SERVO_DEFAULT_VALUE);
   }
@@ -245,23 +263,23 @@ void processRCString(String command) {
 
           receiveServoValue[servoIndex] = singleCommand.toInt();
 
-          
-           if (receiveServoValue[servoIndex] != oldServValue[servoIndex]) {
 
-              if(receiveServoValue[servoIndex] > SERVO_DEFAULT_MAX_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MAX_VALUE;
-              if(receiveServoValue[servoIndex] < SERVO_DEFAULT_MIN_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MIN_VALUE;
-              oldServValue[servoIndex] = receiveServoValue[servoIndex];
+          if (receiveServoValue[servoIndex] != oldServValue[servoIndex]) {
 
-//               int thisAngle = map(receiveServoValue[servoIndex], 544, 2400, 0, 180);
-//               robotServo[servoIndex].write(thisAngle);
-              robotServo[servoIndex].writeMicroseconds(receiveServoValue[servoIndex]);
-           }
-          
+            if (receiveServoValue[servoIndex] > SERVO_DEFAULT_MAX_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MAX_VALUE;
+            if (receiveServoValue[servoIndex] < SERVO_DEFAULT_MIN_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MIN_VALUE;
+            oldServValue[servoIndex] = receiveServoValue[servoIndex];
+
+            //               int thisAngle = map(receiveServoValue[servoIndex], 544, 2400, 0, 180);
+            //               robotServo[servoIndex].write(thisAngle);
+            robotServo[servoIndex].writeMicroseconds(receiveServoValue[servoIndex]);
+          }
+
           servoIndex ++;
 
         }
 
-        
+
 
       }
 
@@ -290,23 +308,23 @@ void processRCString(String command) {
 
           receiveServoValue[servoIndex] = singleCommand.toInt();
 
-          
-           if (receiveServoValue[servoIndex] != oldServValue[servoIndex]) {
 
-              if(receiveServoValue[servoIndex] > SERVO_DEFAULT_MAX_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MAX_VALUE;
-              if(receiveServoValue[servoIndex] < SERVO_DEFAULT_MIN_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MIN_VALUE;
-              oldServValue[servoIndex] = receiveServoValue[servoIndex];
+          if (receiveServoValue[servoIndex] != oldServValue[servoIndex]) {
 
-//               int thisAngle = map(receiveServoValue[servoIndex], 544, 2400, 0, 180);
-//               robotServo[servoIndex].write(thisAngle);
-              //crobotServo[servoIndex].writeMicroseconds(receiveServoValue[servoIndex]);
-           }
-          
+            if (receiveServoValue[servoIndex] > SERVO_DEFAULT_MAX_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MAX_VALUE;
+            if (receiveServoValue[servoIndex] < SERVO_DEFAULT_MIN_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MIN_VALUE;
+            oldServValue[servoIndex] = receiveServoValue[servoIndex];
+
+            //               int thisAngle = map(receiveServoValue[servoIndex], 544, 2400, 0, 180);
+            //               robotServo[servoIndex].write(thisAngle);
+            //crobotServo[servoIndex].writeMicroseconds(receiveServoValue[servoIndex]);
+          }
+
           servoIndex ++;
 
         }
 
-        
+
 
       }
 
@@ -318,72 +336,72 @@ void processRCString(String command) {
     int tankServo1 = 1500;
     int tankServo0 = 1500;
 
-    if(receiveServoValue[1] >= 1500) {
+    if (receiveServoValue[1] >= 1500) {
 
       int duration = receiveServoValue[1] - 1500;
-      
+
       tankServo1 = tankServo1 + duration;
       tankServo0 = tankServo0 - duration;
-       
+
     } else {
 
       int duration = 1500 - receiveServoValue[1]  ;
 
       tankServo1 = tankServo1 - duration;
       tankServo0 = tankServo0 + duration;
-       
+
     }
 
-    if(receiveServoValue[0] >= 1500) {
+    if (receiveServoValue[0] >= 1500) {
 
-       int duration = receiveServoValue[0] - 1500;
-      
+      int duration = receiveServoValue[0] - 1500;
+
       tankServo1 = tankServo1 + duration;
       tankServo0 = tankServo0 + duration;
     } else {
 
       int duration = 1500 - receiveServoValue[0]  ;
-      
+
       tankServo1 = tankServo1 - duration;
       tankServo0 = tankServo0 - duration;
     }
 
-//    Serial.print("tankServo0:");
-//    Serial.println(tankServo0);
-//
-//    Serial.print("tankServo1:");
-//    Serial.println(tankServo1);
+    //    Serial.print("tankServo0:");
+    //    Serial.println(tankServo0);
+    //
+    //    Serial.print("tankServo1:");
+    //    Serial.println(tankServo1);
 
-    if(tankServo0 < 1000) {
+    if (tankServo0 < 1000) {
       tankServo0 = 1000;
     }
 
-    if(tankServo0 > 2000) {
+    if (tankServo0 > 2000) {
       tankServo0 = 2000;
     }
 
-     if(tankServo1 < 1000) {
+    if (tankServo1 < 1000) {
       tankServo1 = 1000;
     }
 
-    if(tankServo1 > 2000) {
+    if (tankServo1 > 2000) {
       tankServo1 = 2000;
     }
 
-    receiveServoValue[0] = tankServo0;
-    receiveServoValue[1] = tankServo1;
+    // receiveServoValue[0] = tankServo0;
+    // receiveServoValue[1] = tankServo1;
 
-//    Serial.print("servo 0:");
-//    Serial.println(receiveServoValue[0]);
+    //    Serial.print("servo 0:");
+    //    Serial.println(receiveServoValue[0]);
 
-    processDCMotor(receiveServoValue[0], dcMotorPinA);
+    processDCMotor(tankServo0, dcMotorPinA);
 
-    processDCMotor(receiveServoValue[1], dcMotorPinB);
+    processDCMotor(tankServo1, dcMotorPinB);
 
     // 傳給ProcessServoCommand發送訊號;
     processServoCommand(receiveServoValue);     // 處理伺服馬達;
 
-  } else if(command.indexOf("SR2") > -1) {
+  } else if (command.indexOf("SR2") > -1) {
     // Serial.println("接收到第二組伺服馬達命令;");
 
     int i = 3;
@@ -401,34 +419,34 @@ void processRCString(String command) {
 
           receiveServoValue[servoIndex] = singleCommand.toInt();
 
-          
-           if (receiveServoValue[servoIndex] != oldServValue[servoIndex]) {
 
-              if(receiveServoValue[servoIndex] > SERVO_DEFAULT_MAX_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MAX_VALUE;
-              if(receiveServoValue[servoIndex] < SERVO_DEFAULT_MIN_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MIN_VALUE;
-              oldServValue[servoIndex] = receiveServoValue[servoIndex];
+          if (receiveServoValue[servoIndex] != oldServValue[servoIndex]) {
 
-//               int thisAngle = map(receiveServoValue[servoIndex], 544, 2400, 0, 180);
-//               robotServo[servoIndex].write(thisAngle);
-              robotServo[servoIndex].writeMicroseconds(receiveServoValue[servoIndex]);
-           }
-          
+            if (receiveServoValue[servoIndex] > SERVO_DEFAULT_MAX_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MAX_VALUE;
+            if (receiveServoValue[servoIndex] < SERVO_DEFAULT_MIN_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MIN_VALUE;
+            oldServValue[servoIndex] = receiveServoValue[servoIndex];
+
+            //               int thisAngle = map(receiveServoValue[servoIndex], 544, 2400, 0, 180);
+            //               robotServo[servoIndex].write(thisAngle);
+            robotServo[servoIndex].writeMicroseconds(receiveServoValue[servoIndex]);
+          }
+
           servoIndex ++;
 
         }
 
-        
+
 
       }
 
       i = i + 4;
 
     }
-  } else if(command.indexOf("SS8") > -1) {
+  } else if (command.indexOf("SS8") > -1) {
     // Serial.println("接收到第二組伺服馬達命令;");
 
     int i = 3;
-    int servoIndex = 4;
+    int servoIndex = 0;
 
     while (i < commandLength - 1) {     // 解碼;
 
@@ -440,20 +458,32 @@ void processRCString(String command) {
 
         if (servoIndex < numOfServo) {
 
-          receiveServoValue[servoIndex] = singleCommand.toInt();
+          char buf[2];
+          // singleCommand.toCharArray(buf, 2 );
+          buf[0] = singleCommand.charAt(0);
+          buf[1] = singleCommand.charAt(1);
 
-          
-           if (receiveServoValue[servoIndex] != oldServValue[servoIndex]) {
+          // receiveServoValue[servoIndex] = singleCommand.toInt();
+          int servoValue =  convertHexStringToInt(buf);
+          receiveServoValue[servoIndex] = servoValue * 10;
 
-              if(receiveServoValue[servoIndex] > SERVO_DEFAULT_MAX_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MAX_VALUE;
-              if(receiveServoValue[servoIndex] < SERVO_DEFAULT_MIN_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MIN_VALUE;
-              oldServValue[servoIndex] = receiveServoValue[servoIndex];
+//          Serial.print("Servo, i:");
+//          Serial.print(servoIndex);
+//          Serial.print("; value:");
+//          Serial.println(receiveServoValue[servoIndex]);
 
-               int pwmValue = map(receiveServoValue[servoIndex], 0, 99, 544, 2400);
-               // robotServo[servoIndex].write(thisAngle);
-               robotServo[servoIndex].writeMicroseconds(pwmValue);
-           }
-          
+
+          if (receiveServoValue[servoIndex] != oldServValue[servoIndex]) {
+
+            if (receiveServoValue[servoIndex] > SERVO_DEFAULT_MAX_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MAX_VALUE;
+            if (receiveServoValue[servoIndex] < SERVO_DEFAULT_MIN_VALUE) receiveServoValue[servoIndex] = SERVO_DEFAULT_MIN_VALUE;
+            oldServValue[servoIndex] = receiveServoValue[servoIndex];
+
+            // int pwmValue = map(receiveServoValue[servoIndex], 0, 99, 544, 2400);
+            // robotServo[servoIndex].write(thisAngle);
+            robotServo[servoIndex].writeMicroseconds(receiveServoValue[servoIndex]);
+          }
+
           servoIndex ++;
 
         }
@@ -463,6 +493,73 @@ void processRCString(String command) {
       i = i + 2;
 
     }
+
+    // 這裡要處理坦克的訊號
+    int tankServo1 = 1500;
+    int tankServo0 = 1500;
+
+    if (receiveServoValue[1] >= 1500) {
+
+      int duration = receiveServoValue[1] - 1500;
+
+      tankServo1 = tankServo1 + duration;
+      tankServo0 = tankServo0 - duration;
+
+    } else {
+
+      int duration = 1500 - receiveServoValue[1]  ;
+
+      tankServo1 = tankServo1 - duration;
+      tankServo0 = tankServo0 + duration;
+
+    }
+
+    if (receiveServoValue[0] >= 1500) {
+
+      int duration = receiveServoValue[0] - 1500;
+
+      tankServo1 = tankServo1 + duration;
+      tankServo0 = tankServo0 + duration;
+    } else {
+
+      int duration = 1500 - receiveServoValue[0]  ;
+
+      tankServo1 = tankServo1 - duration;
+      tankServo0 = tankServo0 - duration;
+    }
+
+    //    Serial.print("tankServo0:");
+    //    Serial.println(tankServo0);
+    //
+    //    Serial.print("tankServo1:");
+    //    Serial.println(tankServo1);
+
+    if (tankServo0 < 1000) {
+      tankServo0 = 1000;
+    }
+
+    if (tankServo0 > 2000) {
+      tankServo0 = 2000;
+    }
+
+    if (tankServo1 < 1000) {
+      tankServo1 = 1000;
+    }
+
+    if (tankServo1 > 2000) {
+      tankServo1 = 2000;
+    }
+
+    // receiveServoValue[0] = tankServo0;
+    // receiveServoValue[1] = tankServo1;
+
+    //    Serial.print("servo 0:");
+    //    Serial.println(receiveServoValue[0]);
+
+    processDCMotor(tankServo0, dcMotorPinA);
+
+    processDCMotor(tankServo1, dcMotorPinB);
+
   }
 
 }
@@ -615,18 +712,39 @@ void processServoCommand(int servoValue[]) {
 }
 
 void processDCMotor(int pwmValue, int dcMotor[]) {
-  if(pwmValue == 1500) {
-    
+  if (pwmValue == 1500) {
+
     digitalWrite(dcMotor[0], LOW);
     analogWrite(dcMotor[1], 0);
-  
-  } else if(pwmValue > 1500) {
-    int power = map(pwmValue, 1500, 2000, 0 , 255); 
+
+  } else if (pwmValue > 1500) {
+    int power = map(pwmValue, 1500, 2000, 0 , 255);
     digitalWrite(dcMotor[0], LOW);
     analogWrite(dcMotor[1], power);
   } else {
-    int power = map(pwmValue, 1500, 1000, 255 , 0); 
+    int power = map(pwmValue, 1500, 1000, 255 , 0);
     digitalWrite(dcMotor[0], HIGH);
     analogWrite(dcMotor[1], power);
   }
+}
+
+int StrToHex(char str[])
+{
+  return (int) strtol(str, 0, 16);
+}
+
+int convertHexStringToInt(char in[])
+{
+  int tens;
+  int digits;
+    
+  if (!isxdigit(in[0]) || !isxdigit(in[1]))   // Valid hex digit character?
+    return -1;
+
+  in[0] = toupper(in[0]);   // Use upper case
+  in[1] = toupper(in[1]);
+  
+  tens = in[0] >= 'A' ? (in[0] - 'A' + 10) : in[0] - '0';
+  digits = in[1] >= 'A' ? (in[1] - 'A' + 10) : in[1] - '0';
+  return tens * 16 + digits;
 }
